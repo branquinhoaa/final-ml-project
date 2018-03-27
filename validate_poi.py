@@ -40,6 +40,9 @@ accuracy = clf.score(features_test, labels_test)
 # here I show the accuracy of my data:
 
 print("accuracy: ", accuracy)
-
+print(sum(labels_test))
+print(sum(labels_train))
+print(len(labels_test))
+print(len(labels_train))
 
 
