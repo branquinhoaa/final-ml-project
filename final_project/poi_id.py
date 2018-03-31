@@ -63,9 +63,16 @@ grr = pd.plotting.scatter_matrix(new_data_frame, alpha=0.8, c=comm_labels, cmap=
 ####################################################################
 # NOW I WILL INCLUDE MY NEW FEATURE ON THE DATA SET
 for key, value in data_dict.items():
-	print(key, value)
-	break
-print(data_dict[0])
+	communication_value = 0
+	for com in communication_feature_list[1:]:
+		communication_value += value[com]
+	data_dict[key]['communication_data'] = communication_value
+
+features_list.append('communication_data')
+
+data = featureFormat(data_dict, features_list)
+labels, features = targetFeatureSplit(data)
+
 
 ### Store to my_dataset for easy export below.
 my_dataset = data_dict
