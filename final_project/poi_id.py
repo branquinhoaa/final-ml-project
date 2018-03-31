@@ -7,23 +7,66 @@ sys.path.append("../tools/")
 from feature_format import featureFormat, targetFeatureSplit
 from tester import dump_classifier_and_data
 
-### Task 1: Select what features you'll use.
-### features_list is a list of strings, each of which is a feature name.
-### The first feature must be "poi".
-features_list = POI_label.append(financial_features).append(email_features)  
 
-financial_features = ['salary', 'deferral_payments', 'total_payments', 'loan_advances', 'bonus', 'restricted_stock_deferred', 'deferred_income', 'total_stock_value', 'expenses', 'exercised_stock_options', 'other', 'long_term_incentive', 'restricted_stock', 'director_fees'] 
-email_features = ['to_messages', 'email_address', 'from_poi_to_this_person', 'from_messages', 'from_this_person_to_poi', 'shared_receipt_with_poi'] 
+### The first step is select the features I will use. 
+# All features available to use are: 
+# financial_features = ['salary', 'deferral_payments', 'total_payments', 'loan_advances', 'bonus', 'restricted_stock_deferred', 'deferred_income', 'total_stock_value', 'expenses', 'exercised_stock_options', 'other', 'long_term_incentive', 'restricted_stock', 'director_fees'] 
+# email_features = ['to_messages', 'email_address', 'from_poi_to_this_person', 'from_messages', 'from_this_person_to_poi', 'shared_receipt_with_poi'] 
+# POI_label = ['poi']
+
+# features_list is a list of strings, each of which is a feature name.
+# The first feature must be "poi".
+
+financial_features = ['salary', 'bonus', 'director_fees'] 
+email_features = ['from_poi_to_this_person', 'from_this_person_to_poi', 'shared_receipt_with_poi'] 
 POI_label = ['poi']
+features_list = []
+features_list += POI_label + financial_features  
 
 ### Load the dictionary containing the dataset
+
 with open("final_project_dataset.pkl", "r") as data_file:
     data_dict = pickle.load(data_file)
 
+### The second step on my poi identifier is remove the data outliers, or the points that really is out of the 
+# ordinary values. These kind of data can change my results and I want to know how is the data behaviour in general.
+
+# TODO: VERIFY THE BEST WAY TO IDENTIFY THE OUTLIERS
 
 
-### Task 2: Remove outliers
-### Task 3: Create new feature(s)
+### The third step is to create a new feature based in what do you think that makes sense.
+# for me, makes sense to create a feature that sums up all the emails exchanged between a person and a poi.
+# so my new feature means something like how close is the communication between a person and a poi and 
+# my hypotesis is that highest this feature is, highest a chance of a person be a poi too.
+communication_feature_list = ['poi', 'from_poi_to_this_person', 'from_this_person_to_poi', 'shared_receipt_with_poi']
+
+comm_data = featureFormat(data_dict, communication_feature_list)
+
+comm_labels, comm_features = targetFeatureSplit(comm_data)
+
+
+################## CORRELATION CHECK #############################
+# check for correlations between any pair of communication feature
+# plot a graph to analyse the correlation
+import pandas as pd
+from matplotlib.colors import ListedColormap
+from matplotlib import cm
+import matplotlib.pyplot as plt
+
+# palette = {0 : 'blue', 1 : 'red'}
+# comm_correlation = map(lambda x: palette[int(x)], comm_labels)
+
+new_data_frame = pd.DataFrame(comm_features, columns=communication_feature_list[1:])
+collor_map = cm.get_cmap('Spectral')
+grr = pd.plotting.scatter_matrix(new_data_frame, alpha=0.8, c=comm_labels, cmap=collor_map)
+#plt.show()
+####################################################################
+# NOW I WILL INCLUDE MY NEW FEATURE ON THE DATA SET
+for key, value in data_dict.items():
+	print(key, value)
+	break
+print(data_dict[0])
+
 ### Store to my_dataset for easy export below.
 my_dataset = data_dict
 
